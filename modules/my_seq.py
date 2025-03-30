@@ -20,10 +20,10 @@ EMISSION_MATRIX = {
         'G': {'A': 0.4, 'C': 0.1, 'T': 0.4, 'G': 0.1}
     }
 }
-NUCLEOTIDES = np.array(['A', 'C', 'T', 'G'])
-STATES = np.array(['A', 'B'])
+NUCLEOTIDES = ('A', 'C', 'T', 'G')
+STATES = ('A', 'B')
 
-def random_seq(transition_matrix, emission_matrix, n):
+def random_seq(transition_matrix: dict, emission_matrix: dict, n: int) -> np.ndarray:
     """
     Generate a synthetic DNA sequence and its corresponding hidden state
     sequence.
@@ -36,19 +36,19 @@ def random_seq(transition_matrix, emission_matrix, n):
         n (int): Length of the generated sequence.
 
     Returns:
-        list: A list containing the generated DNA sequence and its hidden state
-        sequence.
+        np.ndarray: 2D array containing sequence and hidden state arrays.
     """
-    seq = np.random.choice(NUCLEOTIDES) # init with random nucleotide
-    hidden = np.random.choice(STATES)
+    seq = np.empty((n,), dtype='U1')
+    seq[0] = random.choice(NUCLEOTIDES)
+    hidden = np.empty((n,), dtype='U1')
+    hidden[0] = random.choice(STATES)
 
-    for i in range(n-1):
-        weight_arr_sq = np.array([weight for weight in emission_matrix[hidden[-1]][seq[-1]].values()])
-        np.append(seq, random.choices(NUCLEOTIDES, weight_arr_sq))
+    for i in range(n - 1):
+        seq_wgh = np.array([wgh for wgh in emission_matrix[hidden[i]][seq[i]].values()])
+        hid_wgh = np.array([wgh for wgh in transition_matrix[hidden[i]].values()])
 
-        weight_arr_st = np.array([transition_matrix[hidden[-1]].values()])
-        np.append(hidden, random.choices(STATES, weight_arr_st))
-
+        seq[i + 1] = np.array(random.choices(NUCLEOTIDES, seq_wgh, k=1))[0]
+        hidden[i + 1] = np.array(random.choices(STATES, hid_wgh, k=1))[0]
     return np.array([''.join(seq), ''.join(hidden)])
 
 def main(args):
@@ -81,9 +81,12 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("length", type=int, help="Desired length of the DNA sequence")
-    parser.add_argument("chroms", type=int, help="Number of synthetic DNA sequences to generate")
-    parser.add_argument("out_name", nargs='?', help="Name of the output file (optional)")
-    args = parser.parse_args()
-    main(args)
+    print(
+        random_seq(TRANSITION_MATRIX, EMISSION_MATRIX, 10)
+    )
+#    parser = argparse.ArgumentParser()
+#    parser.add_argument("length", type=int, help="Desired length of the DNA sequence")
+#    parser.add_argument("chroms", type=int, help="Number of synthetic DNA sequences to generate")
+#    parser.add_argument("out_name", nargs='?', help="Name of the output file (optional)")
+#    args = parser.parse_args()
+#    main(args)
