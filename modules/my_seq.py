@@ -51,42 +51,7 @@ def random_seq(transition_matrix: dict, emission_matrix: dict, n: int) -> np.nda
         hidden[i + 1] = np.array(random.choices(STATES, hid_wgh, k=1))[0]
     return np.array([''.join(seq), ''.join(hidden)])
 
-def main(args):
-    """
-    Main function to generate synthetic DNA sequences and stream them to stdout
-    or save to a file.
-
-    Args:
-        args (argparse.Namespace): Command-line arguments.
-    """
-    length = args.length
-    chroms = args.chroms
-
-    if args.out_name:
-        out_name = args.out_name
-        outstream = open(out_name, "w")
-    else:
-        # If no output file is provided, stream to stdout
-        outstream = sys.stdout
-
-    outseq = []
-    for _ in range(chroms):
-        seq_oh = random_seq(TRANSITION_MATRIX, EMISSION_MATRIX, length)
-        seq = seq_oh[0].lower()
-        outseq.append(seq)
-
-    with outstream as outfasta:
-        for i, x in enumerate(outseq):
-            outfasta.write(f">{i}\n{x}\n")
-
-
 if __name__ == "__main__":
     print(
         random_seq(TRANSITION_MATRIX, EMISSION_MATRIX, 10)
     )
-#    parser = argparse.ArgumentParser()
-#    parser.add_argument("length", type=int, help="Desired length of the DNA sequence")
-#    parser.add_argument("chroms", type=int, help="Number of synthetic DNA sequences to generate")
-#    parser.add_argument("out_name", nargs='?', help="Name of the output file (optional)")
-#    args = parser.parse_args()
-#    main(args)
